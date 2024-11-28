@@ -3,7 +3,7 @@ from flask_restx import Api, Resource, fields, reqparse
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from pymongo import MongoClient
 from datetime import timedelta
-import yaml
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -28,10 +28,6 @@ jwt = JWTManager(app)
 # Flask-RESTX API setup with Swagger
 api = Api(app, version='1.0', title='Recipe API', description='API for managing dessert recipes')
 
-# Load OpenAPI (Swagger) specification from YAML file
-with open('openAPI.yaml', 'r') as file:
-    openapi_spec = yaml.safe_load(file)
-api.specs = openapi_spec 
 
 # Define request model (for post/put requests)
 recipe_model = api.model('Recipe', {
