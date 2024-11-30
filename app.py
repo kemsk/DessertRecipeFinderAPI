@@ -2,20 +2,18 @@ from flask import Flask, request
 from flask_restx import Api, Resource, fields
 from pymongo import MongoClient
 
-# Initialize Flask app and RESTX API
 app = Flask(__name__)
 api = Api(app, version='1.0', title='Recipe API', description='API for dessert recipes')
 
-# MongoDB connection
 client = MongoClient("mongodb+srv://20220024573:T7CmWQ47ed9s8kpv@recipecluster.81ir5.mongodb.net/")
 db = client['RecAPI']
 recipes_collection = db['Recipes']
 ingredients_collection = db['Ingredients']
 
-# Define API namespace
+
 ns = api.namespace('recipes', description='Recipe operations')
 
-# Define Recipe model for Swagger
+
 recipe_model = api.model('Recipe', {
     'recipeID': fields.String(required=True, description='Recipe ID'),
     'name': fields.String(required=True, description='Recipe Name'),
@@ -43,7 +41,7 @@ class RecipeList(Resource):
                 'recipeID': recipe['recipeID'],
                 'name': recipe['name'],
                 'instructions': recipe.get('instructions', 'N/A'),
-                'category': recipe.get('category', 'N/A'),
+                'category': recipe.get('type', 'N/A'),
                 'ingredients': ingredients
             })
         return response
@@ -57,7 +55,7 @@ class RecipeList(Resource):
             'recipeID': new_recipe['recipeID'],
             'name': new_recipe['name'],
             'instructions': new_recipe.get('instructions', ''),
-            'category': new_recipe.get('category', '')
+            'category': new_recipe.get('type', '')
         })
         for ingredient in new_recipe.get('ingredients', []):
             ingredient['recipeID'] = new_recipe['recipeID']
@@ -82,7 +80,7 @@ class RecipeSearch(Resource):
                 'recipeID': recipe['recipeID'],
                 'name': recipe['name'],
                 'instructions': recipe.get('instructions', 'N/A'),
-                'category': recipe.get('category', 'N/A'),
+                'category': recipe.get('type', 'N/A'),
                 'ingredients': ingredients
             })
         return response
