@@ -9,9 +9,10 @@ client = MongoClient("mongodb+srv://20220024573:T7CmWQ47ed9s8kpv@recipecluster.8
 db = client['RecAPI']
 recipes_collection = db['Recipes']
 ingredients_collection = db['Ingredients']
+#will be adding the other 6 collections later
 
 
-ns = api.namespace('recipes', description='Recipe operations')
+ns = api.namespace('Recipes', description='Recipe operations')
 
 
 recipe_model = api.model('Recipe', {
@@ -30,11 +31,10 @@ recipe_model = api.model('Recipe', {
     'UpdatedDate': fields.String(description='Last Updated Date'),
     'ingredients': fields.List(fields.Nested(api.model('Ingredient', {
         'name': fields.String(description='Ingredient Name'),
-        'quantity': fields.String(description='Ingredient Quantity')
-    })))
+        'quantity': fields.String(description='Ingredient Quantity') })))
 })
 
-# Endpoint to get all recipes
+
 @ns.route('/')
 class RecipeList(Resource):
     @ns.doc('list_recipes')
@@ -50,7 +50,7 @@ class RecipeList(Resource):
                    'recipeID': recipe['recipeID'],
                     'name': recipe['name'],
                     'description': recipe.get('description', ''),
-                    'origin': recipe.get('origin', ''),  # Use .get() to avoid KeyError
+                    'origin': recipe.get('origin', ''),
                     'category': recipe.get('type', ''),
                     'serving': recipe.get('serving', ''),
                     'preptime': recipe.get('prep_time', ''),
@@ -73,7 +73,7 @@ class RecipeList(Resource):
                 'recipeID': new_recipe['recipeID'],
                 'name': new_recipe['name'],
                 'description': new_recipe.get('description', ''),
-                'origin': new_recipe.get('origin', ''),  # Use .get() to avoid KeyError
+                'origin': new_recipe.get('origin', ''),  
                 'category': new_recipe.get('type', ''),
                 'serving': new_recipe.get('serving', ''),
                 'preptime': new_recipe.get('prep_time', ''),
@@ -90,7 +90,6 @@ class RecipeList(Resource):
             ingredients_collection.insert_one(ingredient)
         return {"message": "Recipe added successfully"}, 201
 
-# Endpoint to get a recipe by name
 @ns.route('/search')
 class RecipeSearch(Resource):
     @ns.doc('get_recipe_by_name')
