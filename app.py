@@ -40,9 +40,17 @@ class RecipeList(Resource):
             response.append({
                 'recipeID': recipe['recipeID'],
                 'name': recipe['name'],
-                'instructions': recipe.get('instructions', 'N/A'),
-                'category': recipe.get('type', 'N/A'),
-                'ingredients': ingredients
+                'description': recipe['description'],
+                'origin': recipe['origin'],
+                'category': recipe.get('type', ''),
+                'serving': recipe['serving'],
+                'preptime': recipe['prep_time'],
+                'cooktime': recipe['cook_time'],
+                'difficulty': recipe['difficulty'],
+                'majorIngredient': recipe['majorIngredient'],
+                'instructions': recipe.get('instructions', ''),
+                'createdDate': recipe('createdAt', ''),
+                'UpdatedDate': recipe('updatedAt', '')
             })
         return response
 
