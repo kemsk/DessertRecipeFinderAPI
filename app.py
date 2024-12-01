@@ -54,8 +54,17 @@ class RecipeList(Resource):
         recipes_collection.insert_one({
             'recipeID': new_recipe['recipeID'],
             'name': new_recipe['name'],
+            'description': new_recipe['description'],
+            'origin': new_recipe['origin'],
+            'category': new_recipe.get('type', ''),
+            'serving': new_recipe['serving'],
+            'preptime': new_recipe['prep_time'],
+            'cooktime': new_recipe['cook_time'],
+            'difficulty': new_recipe['difficulty'],
+            'majorIngredient': new_recipe['majorIngredient'],
             'instructions': new_recipe.get('instructions', ''),
-            'category': new_recipe.get('type', '')
+            'createdDate': new_recipe('createdAt', ''),
+            'UpdatedDate': new_recipe('updatedAt', '')
         })
         for ingredient in new_recipe.get('ingredients', []):
             ingredient['recipeID'] = new_recipe['recipeID']
