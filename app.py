@@ -17,8 +17,17 @@ ns = api.namespace('recipes', description='Recipe operations')
 recipe_model = api.model('Recipe', {
     'recipeID': fields.String(required=True, description='Recipe ID'),
     'name': fields.String(required=True, description='Recipe Name'),
-    'instructions': fields.String(description='Recipe Instructions'),
+    'description': fields.String(description='Recipe Description'),
+    'origin': fields.String(description='Recipe Origin'),
     'category': fields.String(description='Recipe Category'),
+    'serving': fields.String(description='Number of servings'),
+    'preptime': fields.String(description='Preparation time'),
+    'cooktime': fields.String(description='Cooking time'),
+    'difficulty': fields.String(description='Recipe Difficulty'),
+    'majorIngredient': fields.String(description='Major Ingredient'),
+    'instructions': fields.String(description='Recipe Instructions'),
+    'createdDate': fields.String(description='Creation Date'),
+    'UpdatedDate': fields.String(description='Last Updated Date'),
     'ingredients': fields.List(fields.Nested(api.model('Ingredient', {
         'name': fields.String(description='Ingredient Name'),
         'quantity': fields.String(description='Ingredient Quantity')
@@ -38,20 +47,21 @@ class RecipeList(Resource):
             recipe_ingredients = ingredients_collection.find({'recipeID': recipe['recipeID']})
             ingredients = [{'name': ing['name'], 'quantity': ing['quantity']} for ing in recipe_ingredients]
             response.append({
-                'recipeID': recipe['recipeID'],
-                'name': recipe['name'],
-                'description': recipe['description'],
-                'origin': recipe['origin'],
-                'category': recipe.get('type', ''),
-                'serving': recipe['serving'],
-                'preptime': recipe['prep_time'],
-                'cooktime': recipe['cook_time'],
-                'difficulty': recipe['difficulty'],
-                'majorIngredient': recipe['majorIngredient'],
-                'instructions': recipe.get('instructions', ''),
-                'createdDate': recipe('createdAt', ''),
-                'UpdatedDate': recipe('updatedAt', '')
-            })
+                   'recipeID': recipe['recipeID'],
+                    'name': recipe['name'],
+                    'description': recipe.get('description', ''),
+                    'origin': recipe.get('origin', ''),  # Use .get() to avoid KeyError
+                    'category': recipe.get('type', ''),
+                    'serving': recipe.get('serving', ''),
+                    'preptime': recipe.get('prep_time', ''),
+                    'cooktime': recipe.get('cook_time', ''),
+                    'difficulty': recipe.get('difficulty', ''),
+                    'majorIngredient': recipe.get('majorIngredient', ''),
+                    'instructions': recipe.get('instructions', ''),
+                    'createdDate': recipe.get('createdAt', ''),
+                    'UpdatedDate': recipe.get('updatedAt', ''),
+                    'ingredients': ingredients
+                            })
         return response
 
     @ns.doc('create_recipe')
@@ -60,19 +70,20 @@ class RecipeList(Resource):
         """Create a new recipe with ingredients"""
         new_recipe = request.json
         recipes_collection.insert_one({
-            'recipeID': new_recipe['recipeID'],
-            'name': new_recipe['name'],
-            'description': new_recipe['description'],
-            'origin': new_recipe['origin'],
-            'category': new_recipe.get('type', ''),
-            'serving': new_recipe['serving'],
-            'preptime': new_recipe['prep_time'],
-            'cooktime': new_recipe['cook_time'],
-            'difficulty': new_recipe['difficulty'],
-            'majorIngredient': new_recipe['majorIngredient'],
-            'instructions': new_recipe.get('instructions', ''),
-            'createdDate': new_recipe('createdAt', ''),
-            'UpdatedDate': new_recipe('updatedAt', '')
+                'recipeID': new_recipe['recipeID'],
+                'name': new_recipe['name'],
+                'description': new_recipe.get('description', ''),
+                'origin': new_recipe.get('origin', ''),  # Use .get() to avoid KeyError
+                'category': new_recipe.get('type', ''),
+                'serving': new_recipe.get('serving', ''),
+                'preptime': new_recipe.get('prep_time', ''),
+                'cooktime': new_recipe.get('cook_time', ''),
+                'difficulty': new_recipe.get('difficulty', ''),
+                'majorIngredient': new_recipe.get('majorIngredient', ''),
+                'instructions': new_recipe.get('instructions', ''),
+                'createdDate': new_recipe.get('createdAt', ''),
+                'UpdatedDate': new_recipe.get('updatedAt', ''),
+    
         })
         for ingredient in new_recipe.get('ingredients', []):
             ingredient['recipeID'] = new_recipe['recipeID']
@@ -94,11 +105,20 @@ class RecipeSearch(Resource):
             recipe_ingredients = ingredients_collection.find({'recipeID': recipe['recipeID']})
             ingredients = [{'name': ing['name'], 'quantity': ing['quantity']} for ing in recipe_ingredients]
             response.append({
-                'recipeID': recipe['recipeID'],
-                'name': recipe['name'],
-                'instructions': recipe.get('instructions', 'N/A'),
-                'category': recipe.get('type', 'N/A'),
-                'ingredients': ingredients
+                    'recipeID': recipe['recipeID'],
+                    'name': recipe['name'],
+                    'description': recipe.get('description', ''),
+                    'origin': recipe.get('origin', ''),  # Use .get() to avoid KeyError
+                    'category': recipe.get('type', ''),
+                    'serving': recipe.get('serving', ''),
+                    'preptime': recipe.get('prep_time', ''),
+                    'cooktime': recipe.get('cook_time', ''),
+                    'difficulty': recipe.get('difficulty', ''),
+                    'majorIngredient': recipe.get('majorIngredient', ''),
+                    'instructions': recipe.get('instructions', ''),
+                    'createdDate': recipe.get('createdAt', ''),
+                    'UpdatedDate': recipe.get('updatedAt', ''),
+                    'ingredients': ingredients
             })
         return response
 
