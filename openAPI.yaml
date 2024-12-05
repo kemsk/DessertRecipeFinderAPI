@@ -89,10 +89,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Recipe'
-                  Ingredients:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Ingredients'
                   NutritionInfo:
                     type: array
                     items:
@@ -101,70 +97,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/DietaryBenefits'
-                  Picture:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Picture'
-                  Video:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Video'
-                  Author:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Author'  
+ 
                     
                   
         '400':
           description: Invalid parameters
-    post:
-      tags:
-        - Recipe
-      summary: Add a new recipe
-      security:
-        - apiKeyUser: []  
-      description: Adds a new recipe to the collection, with additional nutritional and dietary information.
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  Recipe:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Recipe'
-                  Ingredients:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Ingredients'
-                  NutritionInfo:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/NutritionInfo'
-                  DietaryBenefits:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/DietaryBenefits'
-                  Picture:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Picture'
-                  Video:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Video'
-                  Author:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Author' 
-      responses:
-        '201':
-          description: Recipe created successfully
-        '400':
-          description: Invalid input
-
+ 
   '/recipes/{name}':
     get:
       tags:
@@ -180,27 +118,6 @@ paths:
           schema:
             type: string
           description: The name of the recipe.
-        - in: query
-          name: Author
-          required: false
-          schema:
-            $ref: "#/components/schemas/User"
-          description: The author of the recipe
-        - in: query
-          name: Ingredients
-          required: false
-          schema:
-            $ref: "#/components/schemas/Ingredients"
-        - in: query
-          name: nutrition_info
-          required: false
-          schema:
-            $ref: "#/components/schemas/NutritionInfo"
-        - in: query
-          name: Dietary_benefits
-          required: false
-          schema:
-            $ref: "#/components/schemas/DietaryBenefits"
       responses:
         '200':
           description: Recipe details.
@@ -213,10 +130,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Recipe'
-                  Ingredients:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Ingredients'
                   NutritionInfo:
                     type: array
                     items:
@@ -225,32 +138,314 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/DietaryBenefits'
-                  Picture:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Picture'
-                  Video:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Video'
-                  Author:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Author' 
+
         '404':
           description: Recipe not found
           
-    put:
+  '/recipes/{name}/dietary-benefits': 
+    get:
       tags:
         - Recipe
-      summary: Replace the entire recipe with the provided data
+      summary: Retrieve a specific recipes Dietary Beenefits
+      description: Search Dietary benefits of a recipe by its name
       parameters:
         - in: path
           name: name
           required: true
           schema:
             type: string
-          description: The unique identifier for the recipe
+          description: Name of recipe
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Author details and their recipes retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                   DietaryBenefits:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DietaryBenefits'
+        '401':
+          description: Unauthorized – Missing or invalid token.
+        '404':
+          description: User not found.
+    
+  '/recipes/{name}/nutrition-info': 
+    get:
+      tags:
+        - Recipe
+      summary: Retrieve a specific recipes Nutrition Info
+      description: Search Nutrition Info of a recipe by its name
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of a recipe 
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Author details and their recipes retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  NutritionInfo:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NutritionInfo'
+                  
+  /users/login:
+      post:
+        tags:
+          - User
+        summary: User Login
+        description: >
+          Allows users to log in with their credentials (email and password). Returns a secure API key or JWT token for subsequent authenticated requests.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: The email address of the user
+                    example: johndoe@example.com
+                  password:
+                    type: string
+                    description: The password of the user
+                    example: securepassword123
+        responses:
+          '200':
+            description: Login successful, returns an API key or JWT token.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      description: Auth token (JWT or API key)
+                      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          '400':
+            description: Invalid credentials.
+          '401':
+            description: Unauthorized – Invalid credentials or missing token.
+    
+  /users/create:
+      post:
+        tags:
+          - User
+        summary: Create a user account
+        description: Creates a new user account.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: The email address of the user
+                    example: johndoe@example.com
+                  password:
+                    type: string
+                    description: The password for the user account
+                    example: securepassword123
+        responses:
+          '201':
+            description: User account created successfully.
+          '400':
+            description: Bad request – Invalid or missing parameters.
+    
+  /users/delete:
+      delete:
+        tags:
+          - User
+        summary: Delete a user account
+        description: Deletes an existing user account.
+        security:
+          - apiKeyAuth: []
+        parameters:
+          - in: query
+            name: email
+            required: true
+            schema:
+              type: string
+            description: The email address of the user to be deleted.
+        responses:
+          '200':
+            description: User account deleted successfully.
+          '401':
+            description: Unauthorized – Missing or invalid token.
+          '404':
+            description: User not found.
+  /{userid}/recipes:
+    get:
+      tags:
+        - Author
+      summary: Retrieve all recipes for a specific user
+      description: Fetch all recipes associated with the given userID.
+      parameters:
+        - in: path
+          name: userid
+          required: true
+          schema:
+            type: string
+          description: The unique identifier for the user.
+      responses:
+        '200':
+          description: A list of recipes associated with the provided userID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                    description: The user ID associated with the recipes.
+                  recipes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Invalid parameters – The request parameters are incorrect or incomplete.
+        '404':
+          description: User not found – No recipes associated with the provided userID.
+  
+  /{userid}/recipes/{name}:
+    get:
+      tags:
+        - Author
+      summary: Retrieve a specific recipe under the userID
+      description: Search and retrieve a recipe by its name, scoped to the given userID.
+      parameters:
+        - in: path
+          name: userid
+          required: true
+          schema:
+            type: string
+          description: The unique identifier for the user.
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the recipe to be retrieved.
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Recipe details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                    description: The user ID associated with the recipe.
+                  recipe:
+                    $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Unauthorized – Missing or invalid authentication token.
+        '404':
+          description: Recipe not found – No matching recipe under the provided userID.
+
+  /{userid}/recipes/create: 
+    post:
+      tags:
+        - Author
+      summary: Add a new recipe
+      security:
+        - apiKeyUser: []  
+      description: Adds a new recipe to the collection, with additional nutritional and dietary information.
+      parameters: 
+        - in: path
+          name: userid
+          required: true
+          schema:
+            type: string
+          description:  The unique identifier for the user.
+        - in: query
+          name: Recipe
+          required: false
+          schema:
+            $ref: "#/components/schemas/Recipe"
+        - in: query
+          name: nutrition_info
+          required: false
+          schema:
+            $ref: "#/components/schemas/NutritionInfo"
+        - in: query
+          name: Dietary_benefits
+          required: false
+          schema:
+            $ref: "#/components/schemas/DietaryBenefits"
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Recipe:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipe'
+                  NutritionInfo:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NutritionInfo'
+                  DietaryBenefits:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DietaryBenefits'
+
+      responses:
+        '201':
+          description: Recipe created successfully
+        '400':
+          description: Invalid input
+
+          
+  /{userid}/recipes/update:         
+    put:
+      tags:
+        - Author
+      summary: Replace the entire recipe with the provided data
+      parameters:
+        - in: path
+          name: userid
+          required: true
+          schema:
+            type: string
+          description: The unique identifier for the user.
+        - in: query
+          name: Recipe
+          required: false
+          schema:
+            $ref: "#/components/schemas/Recipe"
+        - in: query
+          name: nutrition_info
+          required: false
+          schema:
+            $ref: "#/components/schemas/NutritionInfo"
+        - in: query
+          name: Dietary_benefits
+          required: false
+          schema:
+            $ref: "#/components/schemas/DietaryBenefits"
       requestBody:
         required: true
         content:
@@ -269,10 +464,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Recipe'
-                  Ingredients:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Ingredients'
                   NutritionInfo:
                     type: array
                     items:
@@ -281,18 +472,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/DietaryBenefits'
-                  Picture:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Picture'
-                  Video:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Video'
-                  Author:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Author' 
+
               
         400:
           description: Missing fields, not all data was updated
@@ -310,18 +490,18 @@ paths:
 
         404:
           description: Recipe not found
-
+  /{userid}/recipes/patch: 
     patch:
       tags:
-        - Recipe
+        - Author
       summary: Update individual fields of a recipe
       parameters:
         - in: path
-          name: name
+          name: userid
           required: true
           schema:
             type: string
-          description: The name of the recipe.
+          description:  The unique identifier for the user.
         - in: query
           name: description
           required: false
@@ -380,13 +560,8 @@ paths:
           name: Author
           required: false
           schema:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/Users"
           description: The author of the recipe
-        - in: query
-          name: Ingredients
-          required: false
-          schema:
-            $ref: "#/components/schemas/Ingredients"
         - in: query
           name: nutrition_info
           required: false
@@ -401,12 +576,13 @@ paths:
           name: Pictures
           required: false
           schema:
-            $ref: "#/components/schemas/Picture"
+            type: string
         - in: query
           name: Videos
           required: false
           schema:
-            $ref: "#/components/schemas/Video"
+            type: string
+
 
       responses:
         200:
@@ -415,99 +591,35 @@ paths:
           description: Invalid request parameters
         404:
           description: Recipe not found
-    delete:
-      tags:
-        - Recipe
-      summary: Delete an existing dessert recipe by name
-      security:
-        - apiKeyAuth: []  
-      description: Deletes a specific recipe by name.
-      parameters:
-        - in: path
-          name: name
-          required: true
-          schema:
-            type: string
-          description: The name of the recipe to delete.
-      responses:
-        '200':
-          description: Recipe deleted successfully
-        '404':
-          description: Recipe not found
-  /users/login:
-    post:
-      tags:
-        - User
-      summary: User Login
-      description: >
-        Allows users to log in with their credentials (email and password). Returns a secure API key or JWT token for subsequent authenticated requests.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: The email address of the user
-                  example: johndoe@example.com
-                password:
-                  type: string
-                  description: The password of the user
-                  example: securepassword123
-      responses:
-        '200':
-          description: Login successful, returns an API key or JWT token.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Auth token (JWT or API key)
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiVTAwMSIsInJvbGUiOiJzdHVkZW50In0.JrP4lwQeUwXTbFw_oIjbwQ"
-        '400':
-          description: Invalid credentials.
-        '401':
-          description: Unauthorized – Invalid credentials or missing token.
           
-  /users/{userID}/author:
-    get:
-      tags:
-        - User
-      summary: Retrieve author details and their posted recipes
-      description: Retrieves the user details (author information) and all recipes they have posted. Requires authentication with an API key or JWT token.
-      parameters:
-        - in: path
-          name: userID
-          required: true
-          schema:
-            type: string
-          description: The user ID of the author to retrieve.
-      security:
-        - apiKeyAuth: []
-      responses:
-        '200':
-          description: Author details and their recipes retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    $ref: '#/components/schemas/Author'
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Recipe'
-        '401':
-          description: Unauthorized – Missing or invalid token.
-        '404':
-          description: User not found.
+  /{userid}/recipes/delete: 
+      delete:
+        tags:
+          - Author
+        summary: Delete an existing dessert recipe by name
+        security:
+          - apiKeyAuth: []  
+        description: Deletes a specific recipe by name.
+        parameters:
+          - in: path
+            name: userid
+            required: true
+            schema:
+              type: string
+            description: The unique identifier for the user.
+          - in: query
+            name: name
+            required: true
+            schema:
+              type: string
+            description: The name of the recipe to be deleted.
+        responses:
+          '200':
+            description: Recipe deleted successfully.
+          '404':
+            description: Recipe not found.
 
-
+    
 components:
   schemas:
     Recipe:
@@ -553,30 +665,41 @@ components:
           type: string
           description: Primary ingredient used in the recipe
           example: "Rice"
+        ingredients:
+          type: array
+          description: List of ingredients used in the recipe.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the ingredient.
+              quantity:
+                type: number
+                description: Quantity of the ingredient.
+              unit:
+                type: string
+                description: Unit of measurement (e.g., grams, cups).
         instructions:
           type: string
           description: Step-by-step instructions for preparing the dish
           example: "Combine the sticky rice and water in a rice cooker..."
-            
-    Ingredients:
-      type: object
-      properties:
-        recipeID:
+        pictures:
+          type: array
+          items:
+            type: string
+            description: URLs for images of the recipe
+          example: ["http://example.com/image1.jpg"]
+        videos:
+          type: array
+          items:
+            type: string
+            description: URLs for images of the recipe
+          example: ["http://example.com/image1.jpg"]
+        Author:
           type: string
-          description: Unique identifier for the recipe
-          example: "D001"
-        name:
-          type: string
-          description: The name of the ingredient
-          example: "All-Purpose Flour"
-        quantity:
-          type: number
-          description: Quantity of the ingredient
-          example: 200
-        unit:
-          type: string
-          description: Unit of measurement (e.g., grams, cups)
-          example: "grams"
+          description: Author of recipe
+          example: "john doe"
 
     NutritionInfo:
       type: object
@@ -631,66 +754,20 @@ components:
             type: string
           description: List of allergens
           example: ["Nuts", "Dairy"]
-    
-    Picture:
-      type: object
-      properties:
-        recipeID:
-          type: string
-          description: Unique identifier for the recipe
-          example: "D001"
-        pictures:
-          type: array
-          items:
-            type: string
-            description: URLs for images of the recipe
-          example: ["http://example.com/image1.jpg"]
-    Video:
-      type: object
-      properties:
-        recipeID:
-          type: string
-          description: Unique identifier for the recipe
-          example: "D001"  
-        videos:
-          type: array
-          items:
-            type: string
-            description: URLs for images of the recipe
-          example: ["http://example.com/image1.jpg"]
 
 
-    User:
-      type: object
-      properties:
-        userID:
-          type: string
-          description: The unique identifier for the user
-          example: U001
-        name:
-          type: string
-          description: Full name of the user
-          example: John Doe
-        email:
-          type: string
-          description: Email address of the user
-          example: johndoe@example.com
-        role:
-          type: string
-          description: The role of the user (e.g., student, nutritionist, etc.)
-          example: student
 
-    Author:
+    Users:
       type: object
       properties:
-        recipeID:
-          type: string
-          description: Unique identifier for the recipe
-          example: "D001"
-        userID:
+        userid:
           type: string
           description: The unique identifier for the author
           example: A001
+        password:
+          type: string
+          description: password of the user
+          example: userpassword123
         name:
           type: string
           description: Full name of the author
@@ -703,11 +780,11 @@ components:
           type: string
           description: The role of the user (author)
           example: author
-        bio:
+        key:
           type: string
-          description: Short biography of the author
-          example: "John is a professional nutritionist and food writer."
-        
+          description: key token of user
+          example: "qilywvcq21736hbdy407231"
+
           
   securitySchemes:
     apiKeyAuth:
